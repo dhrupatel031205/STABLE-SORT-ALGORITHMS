@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stable Sort Algorithms</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">Stable Sort Visualizer</div>
+
+    <nav class="navbar">
+        <a href="index.html">Home</a>
+        <a href="docs.html">Docs</a>
+
+        <label class="switch">
+            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+            <span class="slider"></span>
+        </label>
+    </nav>
+</header>
+
+<main>
+    <div class="input-output-container">
+        <section class="input-section">
+            <h2>🎯 Enter Numbers for Stable Sorting</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--text); opacity: 0.8;">
+                See how different stable sort algorithms handle your data step-by-step
+            </p>
+
+            <input id="userInput" type="text" placeholder="Example: 4, 2, 5, 2, 1" 
+                   onkeypress="if(event.key === 'Enter') startStableSort()">
+
+            <button onclick="startStableSort()">
+                <span>🚀 Start Sorting</span>
+            </button>
+        </section>
+
+        <section class="output-section">
+            <h2>📊 Comparison Results</h2>
+            <div id="comparisonResults">
+                <div style="text-align: center; padding: 2rem; opacity: 0.6;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+                    <div>Comparison results will appear here after sorting</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <section class="results">
+        <div class="algo-section">
+            <h2>🫧 Bubble Sort — Steps</h2>
+            <div id="bubbleSteps">
+                <div style="text-align: center; padding: 2rem; opacity: 0.6;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🫧</div>
+                    <div>Enter numbers above to see Bubble Sort in action</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-section">
+            <h2>📝 Insertion Sort — Steps</h2>
+            <div id="insertionSteps">
+                <div style="text-align: center; padding: 2rem; opacity: 0.6;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">📝</div>
+                    <div>Enter numbers above to see Insertion Sort in action</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-section">
+            <h2>🔀 Merge Sort — Steps</h2>
+            <div id="mergeSteps">
+                <div style="text-align: center; padding: 2rem; opacity: 0.6;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🔀</div>
+                    <div>Enter numbers above to see Merge Sort in action</div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Modern Alert -->
+<div id="alertOverlay" class="alert-overlay">
+    <div class="alert-box">
+        <h3 id="alertTitle">Alert</h3>
+        <p id="alertMessage"></p>
+        <button onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
