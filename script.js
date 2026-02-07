@@ -256,34 +256,163 @@ function startStableSort() {
 }
 
 /* ============================================================
+   COMPLEXITY ANALYSIS
+============================================================ */
+function isArraySorted(arr) {
+    for (let i = 1; i < arr.length; i++) {
+        if (arr[i-1] > arr[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function isArrayReverseSorted(arr) {
+    for (let i = 1; i < arr.length; i++) {
+        if (arr[i-1] < arr[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function getBubbleSortComplexity(arr, steps) {
+    const n = arr.length;
+    const maxPossibleSteps = (n * (n - 1)) / 2;
+    
+    if (isArraySorted(arr)) {
+        return {
+            complexity: "O(n)",
+            case: "Best",
+            description: "Already sorted"
+        };
+    } else if (isArrayReverseSorted(arr)) {
+        return {
+            complexity: "O(n²)",
+            case: "Worst",
+            description: "Reverse sorted"
+        };
+    } else if (steps > maxPossibleSteps * 0.7) {
+        return {
+            complexity: "O(n²)",
+            case: "Average",
+            description: "Mostly unsorted"
+        };
+    } else {
+        return {
+            complexity: "O(n²)",
+            case: "Average",
+            description: "Partially sorted"
+        };
+    }
+}
+
+function getInsertionSortComplexity(arr, steps) {
+    const n = arr.length;
+    
+    if (isArraySorted(arr)) {
+        return {
+            complexity: "O(n)",
+            case: "Best",
+            description: "Already sorted"
+        };
+    } else if (isArrayReverseSorted(arr)) {
+        return {
+            complexity: "O(n²)",
+            case: "Worst",
+            description: "Reverse sorted"
+        };
+    } else if (steps > n * 2) {
+        return {
+            complexity: "O(n²)",
+            case: "Average",
+            description: "Mostly unsorted"
+        };
+    } else {
+        return {
+            complexity: "O(n²)",
+            case: "Average",
+            description: "Nearly sorted"
+        };
+    }
+}
+
+function getMergeSortComplexity(arr) {
+    // Merge Sort always has O(n log n) complexity regardless of input
+    const n = arr.length;
+    const theoreticalSteps = n * Math.ceil(Math.log2(n));
+    
+    return {
+        complexity: "O(n log n)",
+        case: "All Cases",
+        description: "Consistent performance"
+    };
+}
+
+function getSpaceComplexity(algorithmName) {
+    switch(algorithmName) {
+        case "Bubble Sort":
+        case "Insertion Sort":
+            return {
+                complexity: "O(1)",
+                description: "In-place sorting"
+            };
+        case "Merge Sort":
+            return {
+                complexity: "O(n)",
+                description: "Requires auxiliary array"
+            };
+        default:
+            return {
+                complexity: "O(1)",
+                description: "In-place sorting"
+            };
+    }
+}
+
+/* ============================================================
    COMPARISON RESULTS
 ============================================================ */
 function updateComparisonResults(bubbleSteps, insertionSteps, mergeSteps, originalArr) {
     const resultsDiv = document.getElementById("comparisonResults");
+    
+    // Get dynamic complexity analysis
+    const bubbleComplexity = getBubbleSortComplexity(originalArr, bubbleSteps);
+    const insertionComplexity = getInsertionSortComplexity(originalArr, insertionSteps);
+    const mergeComplexity = getMergeSortComplexity(originalArr);
     
     const algorithms = [
         {
             name: "Bubble Sort",
             icon: "🫧",
             steps: bubbleSteps,
-            complexity: "O(n²)",
-            spaceComplexity: "O(1)",
+            complexity: bubbleComplexity.complexity,
+            case: bubbleComplexity.case,
+            description: bubbleComplexity.description,
+            spaceComplexity: getSpaceComplexity("Bubble Sort").complexity,
+            spaceDescription: getSpaceComplexity("Bubble Sort").description,
             stable: true
         },
         {
             name: "Insertion Sort", 
             icon: "📝",
             steps: insertionSteps,
-            complexity: "O(n²)",
-            spaceComplexity: "O(1)",
+            complexity: insertionComplexity.complexity,
+            case: insertionComplexity.case,
+            description: insertionComplexity.description,
+            spaceComplexity: getSpaceComplexity("Insertion Sort").complexity,
+            spaceDescription: getSpaceComplexity("Insertion Sort").description,
             stable: true
         },
         {
             name: "Merge Sort",
             icon: "🔀",
             steps: mergeSteps,
-            complexity: "O(n log n)",
-            spaceComplexity: "O(n)",
+            complexity: mergeComplexity.complexity,
+            case: mergeComplexity.case,
+            description: mergeComplexity.description,
+            spaceComplexity: getSpaceComplexity("Merge Sort").complexity,
+            spaceDescription: getSpaceComplexity("Merge Sort").description,
             stable: true
         }
     ];
@@ -294,10 +423,21 @@ function updateComparisonResults(bubbleSteps, insertionSteps, mergeSteps, origin
         const efficiency = algo.steps < 10 ? 'Excellent' : algo.steps < 20 ? 'Good' : algo.steps < 30 ? 'Fair' : 'Poor';
         const efficiencyColor = algo.steps < 10 ? 'var(--secondary)' : algo.steps < 20 ? 'var(--accent)' : algo.steps < 30 ? '#f59e0b' : '#ef4444';
         
+        // Determine case color
+        const caseColor = algo.case === 'Best' ? 'var(--secondary)' : 
+                        algo.case === 'Worst' ? '#ef4444' : 
+                        algo.case === 'All Cases' ? 'var(--primary)' : 'var(--accent)';
+        
         html += `
             <div class="comparison-item">
                 <h4>${algo.icon} ${algo.name}</h4>
                 <p>Performance on ${originalArr.length} elements</p>
+                <div class="complexity-info">
+                    <span class="case-badge" style="background-color: ${caseColor}; color: white;">
+                        ${algo.case} Case
+                    </span>
+                    <span class="description-text">${algo.description}</span>
+                </div>
                 <div class="comparison-stats">
                     <div class="stat-item">
                         <div class="stat-label">Steps</div>
@@ -315,6 +455,9 @@ function updateComparisonResults(bubbleSteps, insertionSteps, mergeSteps, origin
                         <div class="stat-label">Space</div>
                         <div class="stat-value">${algo.spaceComplexity}</div>
                     </div>
+                </div>
+                <div class="space-info">
+                    <small>${algo.spaceDescription}</small>
                 </div>
             </div>
         `;

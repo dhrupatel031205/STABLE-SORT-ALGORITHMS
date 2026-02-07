@@ -222,9 +222,46 @@ main {
 }
 
 .comparison-item p {
-    margin: 0;
+    margin: 0 0 0.75rem 0;
     color: var(--text);
     font-size: 0.95rem;
+}
+
+.complexity-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.case-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.description-text {
+    color: var(--text);
+    font-size: 0.9rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.space-info {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+}
+
+.space-info small {
+    color: var(--text);
+    opacity: 0.7;
+    font-size: 0.85rem;
 }
 
 .comparison-stats {
