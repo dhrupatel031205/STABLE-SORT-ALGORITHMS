@@ -30,12 +30,19 @@
                 See how different stable sort algorithms handle your data step-by-step
             </p>
 
-            <input id="userInput" type="text" placeholder="Example: 4, 2, 5, 2, 1" 
-                   onkeypress="if(event.key === 'Enter') startStableSort()">
-
-            <button onclick="startStableSort()">
-                <span>🚀 Start Sorting</span>
-            </button>
+            <div class="input-controls">
+                <input id="userInput" type="text" placeholder="Example: 4, 2, 5, 2, 1" 
+                       onkeypress="if(event.key === 'Enter') startStableSort()">
+                
+                <div class="button-group">
+                    <button onclick="generateRandomInput()" class="generate-btn">
+                        <span>🎲 Generate Random</span>
+                    </button>
+                    <button onclick="startStableSort()">
+                        <span>🚀 Start Sorting</span>
+                    </button>
+                </div>
+            </div>
         </section>
 
         <section class="output-section">

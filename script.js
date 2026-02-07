@@ -88,6 +88,133 @@ function createStepTable(title, rows) {
 }
 
 /* ============================================================
+   RANDOM INPUT GENERATION
+============================================================ */
+function generateRandomInput() {
+    const generationTypes = ['random', 'nearlySorted', 'reverseSorted', 'withDuplicates'];
+    const selectedType = generationTypes[Math.floor(Math.random() * generationTypes.length)];
+    
+    let generatedArray;
+    
+    switch(selectedType) {
+        case 'random':
+            generatedArray = generateRandomArray();
+            break;
+        case 'nearlySorted':
+            generatedArray = generateNearlySortedArray();
+            break;
+        case 'reverseSorted':
+            generatedArray = generateReverseSortedArray();
+            break;
+        case 'withDuplicates':
+            generatedArray = generateArrayWithDuplicates();
+            break;
+        default:
+            generatedArray = generateRandomArray();
+    }
+    
+    // Clear previous results
+    clearResults();
+    
+    // Set the generated input
+    document.getElementById('userInput').value = generatedArray.join(', ');
+    
+    // Show a brief notification about what was generated
+    const typeMessages = {
+        'random': 'Random numbers generated',
+        'nearlySorted': 'Nearly sorted array generated',
+        'reverseSorted': 'Reverse sorted array generated',
+        'withDuplicates': 'Array with duplicates generated'
+    };
+    
+    // Add visual feedback
+    const inputField = document.getElementById('userInput');
+    inputField.style.animation = 'pulse 0.5s ease';
+    setTimeout(() => {
+        inputField.style.animation = '';
+    }, 500);
+}
+
+function generateRandomArray() {
+    const size = Math.floor(Math.random() * 8) + 5; // 5-12 elements
+    const array = [];
+    for (let i = 0; i < size; i++) {
+        array.push(Math.floor(Math.random() * 50) + 1); // 1-50
+    }
+    return array;
+}
+
+function generateNearlySortedArray() {
+    const size = Math.floor(Math.random() * 8) + 5; // 5-12 elements
+    const array = [];
+    for (let i = 0; i < size; i++) {
+        array.push(i * 3 + Math.floor(Math.random() * 5)); // Mostly sorted with small variations
+    }
+    
+    // Add a few out-of-place elements
+    if (size > 3) {
+        const swapIndex1 = Math.floor(Math.random() * (size - 2));
+        const swapIndex2 = swapIndex1 + 1 + Math.floor(Math.random() * 2);
+        [array[swapIndex1], array[swapIndex2]] = [array[swapIndex2], array[swapIndex1]];
+    }
+    
+    return array;
+}
+
+function generateReverseSortedArray() {
+    const size = Math.floor(Math.random() * 8) + 5; // 5-12 elements
+    const array = [];
+    const startValue = Math.floor(Math.random() * 30) + 20; // 20-50
+    for (let i = 0; i < size; i++) {
+        array.push(startValue - i * 2); // Descending order
+    }
+    return array;
+}
+
+function generateArrayWithDuplicates() {
+    const size = Math.floor(Math.random() * 8) + 5; // 5-12 elements
+    const array = [];
+    const uniqueValues = Math.floor(size / 2) + 2; // Ensure duplicates
+    
+    for (let i = 0; i < size; i++) {
+        array.push(Math.floor(Math.random() * uniqueValues) + 1); // 1 to uniqueValues
+    }
+    
+    // Shuffle to mix duplicates
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    
+    return array;
+}
+
+function clearResults() {
+    // Clear all result sections
+    const resultIds = ['bubbleSteps', 'insertionSteps', 'mergeSteps', 'comparisonResults'];
+    const emptyMessages = [
+        'Enter numbers above to see Bubble Sort in action',
+        'Enter numbers above to see Insertion Sort in action',
+        'Enter numbers above to see Merge Sort in action',
+        'Comparison results will appear here after sorting'
+    ];
+    
+    resultIds.forEach((id, index) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.innerHTML = `
+                <div style="text-align: center; padding: 2rem; opacity: 0.6;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">
+                        ${id === 'bubbleSteps' ? '🫧' : id === 'insertionSteps' ? '📝' : id === 'mergeSteps' ? '🔀' : '📊'}
+                    </div>
+                    <div>${emptyMessages[index]}</div>
+                </div>
+            `;
+        }
+    });
+}
+
+/* ============================================================
    MAIN
 ============================================================ */
 function startStableSort() {
