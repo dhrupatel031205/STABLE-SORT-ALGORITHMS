@@ -4,7 +4,7 @@
     --card: #ffffff;
     --text: #2d3748;
     --primary: #667eea;
-    --primary-hover: #5a67d8;
+   --primary-hover: #5a67d8;
     --secondary: #48bb78;
     --accent: #ed8936;
     --border: #e2e8f0;
@@ -458,6 +458,7 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-end;
     flex: 1;
     max-width: 60px;
     position: relative;
