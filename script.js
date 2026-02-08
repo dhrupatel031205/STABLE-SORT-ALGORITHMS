@@ -88,6 +88,98 @@ function createStepTable(title, rows) {
 }
 
 /* ============================================================
+   CHART CREATION FOR VISUALIZATION
+============================================================ */
+function createChart(title, dataArray, comparingIndices = [], swappingIndices = [], sortedIndices = []) {
+    const container = document.createElement("div");
+    container.className = "chart-container";
+
+    const heading = document.createElement("h3");
+    heading.className = "chart-title";
+    heading.textContent = title;
+    container.appendChild(heading);
+
+    const chart = document.createElement("div");
+    chart.className = "bar-chart";
+
+    // Find max value for scaling
+    const maxValue = Math.max(...dataArray.map(item => item.value));
+    const minValue = Math.min(...dataArray.map(item => item.value));
+
+    dataArray.forEach((item, index) => {
+        const barWrapper = document.createElement("div");
+        barWrapper.className = "bar-wrapper";
+
+        const bar = document.createElement("div");
+        bar.className = "bar";
+        
+        // Apply special classes based on indices
+        if (comparingIndices.includes(index)) {
+            bar.classList.add("comparing");
+        } else if (swappingIndices.includes(index)) {
+            bar.classList.add("swapping");
+        } else if (sortedIndices.includes(index)) {
+            bar.classList.add("sorted");
+        }
+
+        // Calculate height (scale to fit in 200px container)
+        const height = maxValue > 0 ? ((item.value - minValue) / (maxValue - minValue + 1)) * 180 + 20 : 50;
+        bar.style.height = `${height}px`;
+
+        // Add original index label to the top
+        const indexLabel = document.createElement("div");
+        indexLabel.className = "bar-index";
+        indexLabel.textContent = `[${item.index}]`;
+        barWrapper.appendChild(indexLabel);
+
+        // Add value label inside the bar
+        const valueLabel = document.createElement("div");
+        valueLabel.className = "bar-value";
+        valueLabel.textContent = item.value;
+        bar.appendChild(valueLabel);
+
+        barWrapper.appendChild(bar);
+        chart.appendChild(barWrapper);
+    });
+
+    container.appendChild(chart);
+
+    // Add legend
+    const legend = document.createElement("div");
+    legend.className = "chart-legend";
+    
+    const legendItems = [
+        { class: "normal", text: "Normal" },
+        { class: "comparing", text: "Comparing" },
+        { class: "swapping", text: "Swapping" },
+        { class: "sorted", text: "Sorted" }
+    ];
+
+    legendItems.forEach(item => {
+        const legendItem = document.createElement("div");
+        legendItem.className = "legend-item";
+        
+        const colorBox = document.createElement("div");
+        colorBox.className = `legend-color ${item.class}`;
+        
+        const text = document.createElement("span");
+        text.textContent = item.text;
+        
+        legendItem.appendChild(colorBox);
+        legendItem.appendChild(text);
+        legend.appendChild(legendItem);
+    });
+
+    container.appendChild(legend);
+
+    return container;
+}
+
+function createInitialChart(title, dataArray) {
+    return createChart(title, dataArray);
+}
+
+/* ============================================================
    RANDOM INPUT GENERATION
 ============================================================ */
 function generateRandomInput() {
@@ -477,6 +569,9 @@ function runBubbleSort(original, targetId = "bubbleSteps") {
 
     let step = 1;
 
+    // Add initial chart
+    place.appendChild(createInitialChart("Initial Array", [...arr]));
+
     for (let i = 0; i < arr.length - 1; i++) {
         for (let j = 0; j < arr.length - i - 1; j++) {
 
@@ -485,8 +580,34 @@ function runBubbleSort(original, targetId = "bubbleSteps") {
 
             let decision = first.value > second.value ? "Swap" : "Keep Order";
 
+            // Show comparison state
+            const comparingIndices = [j, j + 1];
+            const swappingIndices = decision === "Swap" ? [j, j + 1] : [];
+            const sortedIndices = Array.from({length: i}, (_, k) => arr.length - 1 - k);
+
+            place.appendChild(
+                createChart(
+                    `Bubble Sort – Step ${step}: Comparing ${first.value} and ${second.value}`, 
+                    [...arr], 
+                    comparingIndices, 
+                    swappingIndices, 
+                    sortedIndices
+                )
+            );
+
             if (decision === "Swap") {
                 [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                
+                // Show state after swap
+                place.appendChild(
+                    createChart(
+                        `Bubble Sort – Step ${step}: After Swap`, 
+                        [...arr], 
+                        [], 
+                        [], 
+                        sortedIndices
+                    )
+                );
             }
 
             place.appendChild(
@@ -504,6 +625,9 @@ function runBubbleSort(original, targetId = "bubbleSteps") {
         }
     }
     
+    // Show final sorted array
+    place.appendChild(createChart("Final Sorted Array", [...arr], [], [], Array.from({length: arr.length}, (_, i) => i)));
+    
     return step - 1; // Return total steps taken
 }
 
@@ -517,11 +641,36 @@ function runInsertionSort(original, targetId = "insertionSteps") {
     let arr = original.map((v, i) => ({ value: v, index: i }));
     let step = 1;
 
+    // Add initial chart
+    place.appendChild(createInitialChart("Initial Array", [...arr]));
+
     for (let i = 1; i < arr.length; i++) {
         let key = arr[i];
         let j = i - 1;
 
+        // Show the key element being inserted
+        place.appendChild(
+            createChart(
+                `Insertion Sort – Step ${step}: Inserting ${key.value}`, 
+                [...arr], 
+                [i], 
+                [], 
+                Array.from({length: i}, (_, k) => k)
+            )
+        );
+
         while (j >= 0 && arr[j].value > key.value) {
+            // Show comparison
+            place.appendChild(
+                createChart(
+                    `Insertion Sort – Step ${step}: Comparing ${arr[j].value} > ${key.value}`, 
+                    [...arr], 
+                    [j, i], 
+                    [], 
+                    Array.from({length: i}, (_, k) => k)
+                )
+            );
+
             place.appendChild(
                 createStepTable(`Insertion Sort – Step ${step}`, [
                     {
@@ -536,10 +685,35 @@ function runInsertionSort(original, targetId = "insertionSteps") {
             arr[j + 1] = arr[j];
             j--;
             step++;
+
+            // Show array after shift
+            place.appendChild(
+                createChart(
+                    `Insertion Sort – Step ${step}: After Shift`, 
+                    [...arr], 
+                    [], 
+                    [j + 1], 
+                    Array.from({length: i}, (_, k) => k)
+                )
+            );
         }
 
         arr[j + 1] = key;
+
+        // Show array after insertion
+        place.appendChild(
+            createChart(
+                `Insertion Sort – Step ${step}: ${key.value} Inserted at Position ${j + 1}`, 
+                [...arr], 
+                [], 
+                [], 
+                Array.from({length: i + 1}, (_, k) => k)
+            )
+        );
     }
+    
+    // Show final sorted array
+    place.appendChild(createChart("Final Sorted Array", [...arr], [], [], Array.from({length: arr.length}, (_, i) => i)));
     
     return step - 1; // Return total steps taken
 }
@@ -555,6 +729,10 @@ function runMergeSort(original, targetId = "mergeSteps") {
     place.innerHTML = "";
 
     let arr = original.map((v, i) => ({ value: v, index: i }));
+    let currentArray = [...arr];
+
+    // Add initial chart
+    place.appendChild(createInitialChart("Initial Array", [...arr]));
 
     function merge(left, right) {
         let result = [];
@@ -575,6 +753,20 @@ function runMergeSort(original, targetId = "mergeSteps") {
                 j++;
             }
 
+            // Update current array for visualization
+            currentArray = [...result, ...left.slice(i), ...right.slice(j)];
+            
+            // Show merge step with current state
+            place.appendChild(
+                createChart(
+                    `Merge Sort – Step ${mergeStep}: ${decision} (${leftVal} vs ${rightVal})`, 
+                    [...currentArray], 
+                    [], 
+                    [result.length - 1], 
+                    []
+                )
+            );
+
             place.appendChild(
                 createStepTable(`Merge Sort – Step ${mergeStep}`, [
                     {
@@ -592,16 +784,52 @@ function runMergeSort(original, targetId = "mergeSteps") {
         return [...result, ...left.slice(i), ...right.slice(j)];
     }
 
-    function mergeSort(arr) {
+    function mergeSort(arr, depth = 0) {
         if (arr.length <= 1) return arr;
 
         let mid = Math.floor(arr.length / 2);
-        let left = mergeSort(arr.slice(0, mid));
-        let right = mergeSort(arr.slice(mid));
+        let left = mergeSort(arr.slice(0, mid), depth + 1);
+        let right = mergeSort(arr.slice(mid), depth + 1);
 
-        return merge(left, right);
+        // Show split visualization
+        if (depth === 0) {
+            const leftValues = left.map(x => x.value).join(', ');
+            const rightValues = right.map(x => x.value).join(', ');
+            place.appendChild(
+                createChart(
+                    `Merge Sort – Splitting: [${leftValues}] and [${rightValues}]`, 
+                    [...arr], 
+                    [], 
+                    [], 
+                    []
+                )
+            );
+        }
+
+        let merged = merge(left, right);
+        
+        // Show merged result
+        if (depth === 0) {
+            currentArray = [...merged];
+            const mergedValues = merged.map(x => x.value).join(', ');
+            place.appendChild(
+                createChart(
+                    `Merge Sort – Merged Result: [${mergedValues}]`, 
+                    [...merged], 
+                    [], 
+                    [], 
+                    Array.from({length: merged.length}, (_, i) => i)
+                )
+            );
+        }
+
+        return merged;
     }
 
-    mergeSort(arr);
+    let sortedArr = mergeSort(arr);
+    
+    // Show final sorted array
+    place.appendChild(createChart("Final Sorted Array", [...sortedArr], [], [], Array.from({length: sortedArr.length}, (_, i) => i)));
+    
     return mergeStep - 1; // Return total steps taken
 }
